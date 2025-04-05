@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated EDA Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .viz-card { margin-bottom: 20px; }
+        .viz-img { max-width: 100%; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .section { margin-bottom: 30px; padding: 20px; border-radius: 10px; background-color: #f8f9fa; }
+        pre { background-color: #f0f0f0; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        h1, h2 { color: #0d6efd; }
+        .nav-tabs { margin-bottom: 20px; }
+        code { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>Automated EDA Dashboard</h1>
+                <p class="lead">Exploratory Data Analysis for: Agrani_Bank_Dataset_Balanced.csv</p>
+                <p>Dataset Shape: 50000 rows × 15 columns</p>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">Summary</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="visualizations-tab" data-bs-toggle="tab" data-bs-target="#visualizations" type="button" role="tab">Visualizations</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="preprocessing-tab" data-bs-toggle="tab" data-bs-target="#preprocessing" type="button" role="tab">Preprocessing</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="insights-tab" data-bs-toggle="tab" data-bs-target="#insights" type="button" role="tab">Insights</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Summary Tab -->
+            <div class="tab-pane fade show active" id="summary" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="section">
+                            <h2>Data Quality Assessment</h2>
+                            <div class="card">
+                                <div class="card-body">
+                                    {<br>&nbsp;&nbsp;"missing_values":&nbsp;"No&nbsp;missing&nbsp;values&nbsp;found&nbsp;in&nbsp;the&nbsp;dataset",<br>&nbsp;&nbsp;"outliers":&nbsp;"Outliers&nbsp;detected&nbsp;in&nbsp;columns&nbsp;'Bank_Deposit_Statement',&nbsp;'Interest_Income',&nbsp;'Interest_Expense',&nbsp;'Average_Earning_Assets',&nbsp;'Net_Income',&nbsp;'Total_Assets',&nbsp;'Shareholder_Equity',&nbsp;'Operating_Expenses',&nbsp;'Operating_Income'.&nbsp;These&nbsp;outliers&nbsp;can&nbsp;significantly&nbsp;affect&nbsp;statistical&nbsp;analysis&nbsp;and&nbsp;modeling.",<br>&nbsp;&nbsp;"data_types":&nbsp;"The&nbsp;dataset&nbsp;includes&nbsp;a&nbsp;mix&nbsp;of&nbsp;data&nbsp;types,&nbsp;including&nbsp;'object',&nbsp;'float64'.&nbsp;Columns&nbsp;'Customer_ID',&nbsp;'Date',&nbsp;'Additional_Info',&nbsp;'Loan_Eligibility'&nbsp;are&nbsp;of&nbsp;type&nbsp;'object',&nbsp;while&nbsp;the&nbsp;rest&nbsp;are&nbsp;numeric."<br>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="section">
+                            <h2>Key Statistics</h2>
+                            <div class="card">
+                                <div class="card-body">
+                                    {<br>&nbsp;&nbsp;"key_findings":&nbsp;[<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;average&nbsp;'Bank_Deposit_Statement'&nbsp;is&nbsp;around&nbsp;$250,174.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;mean&nbsp;'Interest_Income'&nbsp;is&nbsp;approximately&nbsp;$503,184,&nbsp;with&nbsp;a&nbsp;standard&nbsp;deviation&nbsp;of&nbsp;$288,151.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;average&nbsp;'Net_Income'&nbsp;is&nbsp;around&nbsp;$2,516,723.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;mean&nbsp;'Total_Assets'&nbsp;is&nbsp;approximately&nbsp;$501,842,719,&nbsp;indicating&nbsp;large&nbsp;asset&nbsp;values."<br>&nbsp;&nbsp;]<br>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Correlation Analysis</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"correlation_matrix":&nbsp;"A&nbsp;correlation&nbsp;analysis&nbsp;shows&nbsp;strong&nbsp;positive&nbsp;correlations&nbsp;between&nbsp;'Bank_Deposit_Statement',&nbsp;'Interest_Income',&nbsp;'Interest_Expense',&nbsp;'Average_Earning_Assets',&nbsp;'Net_Income',&nbsp;'Total_Assets',&nbsp;and&nbsp;'Shareholder_Equity'.&nbsp;'Market_Share'&nbsp;is&nbsp;moderately&nbsp;correlated&nbsp;with&nbsp;these&nbsp;variables.",<br>&nbsp;&nbsp;"high_correlations":&nbsp;[<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;highest&nbsp;correlations&nbsp;are&nbsp;observed&nbsp;between&nbsp;'Total_Assets'&nbsp;and&nbsp;'Shareholder_Equity'&nbsp;(around&nbsp;0.95),&nbsp;indicating&nbsp;a&nbsp;strong&nbsp;linear&nbsp;relationship.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"High&nbsp;correlation&nbsp;(around&nbsp;0.8)&nbsp;between&nbsp;'Interest_Income'&nbsp;and&nbsp;'Interest_Expense',&nbsp;suggesting&nbsp;a&nbsp;relationship&nbsp;between&nbsp;income&nbsp;and&nbsp;expenses."<br>&nbsp;&nbsp;]<br>}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Patterns and Trends</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"identified_trends":&nbsp;[<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;'Stock_Price'&nbsp;variable&nbsp;shows&nbsp;a&nbsp;moderate&nbsp;positive&nbsp;correlation&nbsp;with&nbsp;'Market_Share',&nbsp;indicating&nbsp;a&nbsp;possible&nbsp;trend&nbsp;where&nbsp;higher&nbsp;market&nbsp;share&nbsp;correlates&nbsp;with&nbsp;higher&nbsp;stock&nbsp;prices.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;data&nbsp;suggests&nbsp;a&nbsp;pattern&nbsp;where&nbsp;higher&nbsp;'Average_Earning_Assets'&nbsp;are&nbsp;associated&nbsp;with&nbsp;higher&nbsp;'Net_Income',&nbsp;indicating&nbsp;potential&nbsp;profitability."<br>&nbsp;&nbsp;],<br>&nbsp;&nbsp;"anomalies":&nbsp;"No&nbsp;significant&nbsp;anomalies&nbsp;detected&nbsp;aside&nbsp;from&nbsp;the&nbsp;previously&nbsp;mentioned&nbsp;outliers."<br>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Visualizations Tab -->
+            <div class="tab-pane fade" id="visualizations" role="tabpanel">
+                <div class="section">
+                    <h2>Key Visualizations</h2>
+                    <div class="row">
+
+                <div class="col-md-6">
+                    <div class="card viz-card">
+                        <div class="card-header">
+                            <h5>Error in Visualization 1</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="/temp/outputs/29e8d45b-b972-4fc1-8997-9b4af14f7007.png" alt="Error in Visualization 1" class="viz-img">
+                            <p class="mt-3">Error: name 'data' is not defined</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card viz-card">
+                        <div class="card-header">
+                            <h5>Error in Visualization 2</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="/temp/outputs/d5eef51f-b81b-43e2-876c-d64386b05f36.png" alt="Error in Visualization 2" class="viz-img">
+                            <p class="mt-3">Error: name 'data' is not defined</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card viz-card">
+                        <div class="card-header">
+                            <h5>Error in Visualization 3</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="/temp/outputs/dea62eef-e2ba-42d4-b35d-961935c07c5f.png" alt="Error in Visualization 3" class="viz-img">
+                            <p class="mt-3">Error: name 'data' is not defined</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card viz-card">
+                        <div class="card-header">
+                            <h5>Error in Visualization 4</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="/temp/outputs/6128fd9f-f811-4d6f-b91f-dc997b21d04f.png" alt="Error in Visualization 4" class="viz-img">
+                            <p class="mt-3">Error: name 'data' is not defined</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card viz-card">
+                        <div class="card-header">
+                            <h5>Error in Visualization 5</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="/temp/outputs/bd02f5e2-60e0-4381-8fdf-0b02988c0af5.png" alt="Error in Visualization 5" class="viz-img">
+                            <p class="mt-3">Error: name 'data' is not defined</p>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+            </div>
+            
+            <!-- Preprocessing Tab -->
+            <div class="tab-pane fade" id="preprocessing" role="tabpanel">
+                <div class="section">
+                    <h2>Recommended Preprocessing Steps</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"handling_missing_values":&nbsp;"No&nbsp;handling&nbsp;required&nbsp;for&nbsp;missing&nbsp;values",<br>&nbsp;&nbsp;"encoding":&nbsp;"Columns&nbsp;'Customer_ID',&nbsp;'Date',&nbsp;'Additional_Info',&nbsp;'Loan_Eligibility'&nbsp;may&nbsp;require&nbsp;encoding&nbsp;to&nbsp;include&nbsp;them&nbsp;in&nbsp;models.&nbsp;We&nbsp;may&nbsp;consider&nbsp;Label&nbsp;Encoding,&nbsp;One-Hot&nbsp;Encoding,&nbsp;or&nbsp;Binary&nbsp;Encoding.",<br>&nbsp;&nbsp;"normalization_needs":&nbsp;"The&nbsp;numeric&nbsp;columns&nbsp;may&nbsp;need&nbsp;normalization&nbsp;to&nbsp;have&nbsp;similar&nbsp;scales,&nbsp;due&nbsp;to&nbsp;large&nbsp;differences&nbsp;in&nbsp;the&nbsp;ranges.&nbsp;This&nbsp;can&nbsp;be&nbsp;achieved&nbsp;using&nbsp;techniques&nbsp;such&nbsp;as&nbsp;Min-Max&nbsp;Scaling&nbsp;or&nbsp;Standardization."<br>}
+                        </div>
+                    </div>
+
+            </div>
+            
+            <!-- Insights Tab -->
+            <div class="tab-pane fade" id="insights" role="tabpanel">
+                <div class="section">
+                    <h2>Key Insights</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"key_takeaways":&nbsp;[<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;dataset&nbsp;shows&nbsp;a&nbsp;strong&nbsp;positive&nbsp;correlation&nbsp;between&nbsp;several&nbsp;financial&nbsp;variables,&nbsp;indicating&nbsp;potential&nbsp;relationships&nbsp;and&nbsp;trends.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"Outliers&nbsp;detected&nbsp;in&nbsp;multiple&nbsp;columns&nbsp;can&nbsp;significantly&nbsp;affect&nbsp;analysis&nbsp;and&nbsp;modeling.&nbsp;Handling&nbsp;these&nbsp;outliers&nbsp;is&nbsp;essential&nbsp;for&nbsp;accurate&nbsp;insights.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"Encoding&nbsp;non-numeric&nbsp;columns&nbsp;and&nbsp;normalization&nbsp;of&nbsp;numeric&nbsp;columns&nbsp;may&nbsp;be&nbsp;necessary&nbsp;for&nbsp;further&nbsp;analysis&nbsp;and&nbsp;modeling.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;distribution&nbsp;of&nbsp;'Bank_Deposit_Statement'&nbsp;and&nbsp;'Net_Income'&nbsp;suggests&nbsp;a&nbsp;wide&nbsp;range&nbsp;of&nbsp;values,&nbsp;which&nbsp;could&nbsp;impact&nbsp;analysis&nbsp;and&nbsp;modeling."<br>&nbsp;&nbsp;]<br>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

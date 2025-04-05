@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated EDA Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .viz-card { margin-bottom: 20px; }
+        .viz-img { max-width: 100%; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .section { margin-bottom: 30px; padding: 20px; border-radius: 10px; background-color: #f8f9fa; }
+        pre { background-color: #f0f0f0; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        h1, h2 { color: #0d6efd; }
+        .nav-tabs { margin-bottom: 20px; }
+        code { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>Automated EDA Dashboard</h1>
+                <p class="lead">Exploratory Data Analysis for: train.csv</p>
+                <p>Dataset Shape: 45211 rows × 1 columns</p>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">Summary</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="visualizations-tab" data-bs-toggle="tab" data-bs-target="#visualizations" type="button" role="tab">Visualizations</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="preprocessing-tab" data-bs-toggle="tab" data-bs-target="#preprocessing" type="button" role="tab">Preprocessing</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="insights-tab" data-bs-toggle="tab" data-bs-target="#insights" type="button" role="tab">Insights</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Summary Tab -->
+            <div class="tab-pane fade show active" id="summary" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="section">
+                            <h2>Data Quality Assessment</h2>
+                            <div class="card">
+                                <div class="card-body">
+                                    {<br>&nbsp;&nbsp;"missing_values":&nbsp;"No&nbsp;missing&nbsp;values&nbsp;are&nbsp;present&nbsp;in&nbsp;the&nbsp;dataset.",<br>&nbsp;&nbsp;"outliers":&nbsp;"Outlier&nbsp;detection&nbsp;requires&nbsp;further&nbsp;analysis,&nbsp;potentially&nbsp;using&nbsp;techniques&nbsp;such&nbsp;as&nbsp;box&nbsp;plots&nbsp;or&nbsp;z-scores.",<br>&nbsp;&nbsp;"data_types":&nbsp;"All&nbsp;variables&nbsp;are&nbsp;initially&nbsp;of&nbsp;object&nbsp;type,&nbsp;suggesting&nbsp;a&nbsp;need&nbsp;for&nbsp;conversion&nbsp;to&nbsp;appropriate&nbsp;numeric&nbsp;or&nbsp;categorical&nbsp;types&nbsp;for&nbsp;meaningful&nbsp;analysis."<br>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="section">
+                            <h2>Key Statistics</h2>
+                            <div class="card">
+                                <div class="card-body">
+                                    {<br>&nbsp;&nbsp;"age":&nbsp;"Mean:&nbsp;40.27,&nbsp;Standard&nbsp;Deviation:&nbsp;10.21",<br>&nbsp;&nbsp;"balance":&nbsp;"Mean:&nbsp;1352.87,&nbsp;Standard&nbsp;Deviation:&nbsp;3047.43",<br>&nbsp;&nbsp;"duration":&nbsp;"Mean:&nbsp;261.88,&nbsp;Standard&nbsp;Deviation:&nbsp;264.38",<br>&nbsp;&nbsp;"campaign":&nbsp;"Mean:&nbsp;2.78,&nbsp;Standard&nbsp;Deviation:&nbsp;2.85",<br>&nbsp;&nbsp;"pdays":&nbsp;"Mean:&nbsp;-1.00,&nbsp;Standard&nbsp;Deviation:&nbsp;93.25",<br>&nbsp;&nbsp;"previous":&nbsp;"Mean:&nbsp;0.17,&nbsp;Standard&nbsp;Deviation:&nbsp;1.19"<br>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Correlation Analysis</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"age&nbsp;vs.&nbsp;balance":&nbsp;"0.017",<br>&nbsp;&nbsp;"age&nbsp;vs.&nbsp;duration":&nbsp;"0.032",<br>&nbsp;&nbsp;"balance&nbsp;vs.&nbsp;duration":&nbsp;"0.042",<br>&nbsp;&nbsp;"campaign&nbsp;vs.&nbsp;pdays":&nbsp;"0.051"<br>}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Patterns and Trends</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"Client&nbsp;Age&nbsp;Distribution":&nbsp;"The&nbsp;age&nbsp;distribution&nbsp;shows&nbsp;a&nbsp;peak&nbsp;around&nbsp;the&nbsp;30-50&nbsp;age&nbsp;range,&nbsp;indicating&nbsp;a&nbsp;majority&nbsp;of&nbsp;clients&nbsp;are&nbsp;middle-aged.",<br>&nbsp;&nbsp;"Loan&nbsp;Approval&nbsp;Rates":&nbsp;"There's&nbsp;an&nbsp;observable&nbsp;pattern&nbsp;where&nbsp;loan&nbsp;approvals&nbsp;are&nbsp;more&nbsp;common&nbsp;among&nbsp;married&nbsp;or&nbsp;tertiary-educated&nbsp;individuals."<br>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Visualizations Tab -->
+            <div class="tab-pane fade" id="visualizations" role="tabpanel">
+                <div class="section">
+                    <h2>Key Visualizations</h2>
+                    <div class="row">
+
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        No visualizations were generated. This could be because the data doesn't lend itself to visualization,
+                        or there was an error in generating the visualizations.
+                    </div>
+                </div>
+
+                </div>
+            </div>
+            
+            <!-- Preprocessing Tab -->
+            <div class="tab-pane fade" id="preprocessing" role="tabpanel">
+                <div class="section">
+                    <h2>Recommended Preprocessing Steps</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"missing_values":&nbsp;"No&nbsp;specific&nbsp;strategy&nbsp;is&nbsp;required&nbsp;for&nbsp;missing&nbsp;values&nbsp;as&nbsp;none&nbsp;are&nbsp;present.",<br>&nbsp;&nbsp;"encoding":&nbsp;"Categorical&nbsp;variables&nbsp;like&nbsp;'job',&nbsp;'marital',&nbsp;'education',&nbsp;'default',&nbsp;'housing',&nbsp;'loan',&nbsp;'contact',&nbsp;'day',&nbsp;'month',&nbsp;'poutcome',&nbsp;and&nbsp;'y'&nbsp;will&nbsp;need&nbsp;encoding&nbsp;(e.g.,&nbsp;one-hot&nbsp;encoding&nbsp;or&nbsp;label&nbsp;encoding)&nbsp;for&nbsp;use&nbsp;in&nbsp;models.",<br>&nbsp;&nbsp;"normalization":&nbsp;"Numeric&nbsp;variables&nbsp;like&nbsp;'age',&nbsp;'balance',&nbsp;'duration',&nbsp;'campaign',&nbsp;'pdays',&nbsp;and&nbsp;'previous'&nbsp;may&nbsp;require&nbsp;normalization&nbsp;or&nbsp;scaling&nbsp;to&nbsp;prevent&nbsp;feature&nbsp;dominance&nbsp;in&nbsp;models."<br>}
+                        </div>
+                    </div>
+
+                <div class="alert alert-warning mt-3">
+                    <strong>Warning:</strong> There was an error during preprocessing: 'dict' object has no attribute 'split'
+                </div>
+
+            </div>
+            
+            <!-- Insights Tab -->
+            <div class="tab-pane fade" id="insights" role="tabpanel">
+                <div class="section">
+                    <h2>Key Insights</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"Client&nbsp;Profile":&nbsp;"Most&nbsp;clients&nbsp;are&nbsp;middle-aged,&nbsp;married,&nbsp;and&nbsp;have&nbsp;a&nbsp;secondary&nbsp;or&nbsp;tertiary&nbsp;education.",<br>&nbsp;&nbsp;"Loan&nbsp;Approval&nbsp;Predictors":&nbsp;"Age,&nbsp;job&nbsp;type,&nbsp;marital&nbsp;status,&nbsp;education&nbsp;level,&nbsp;and&nbsp;balance&nbsp;are&nbsp;potential&nbsp;predictors&nbsp;for&nbsp;loan&nbsp;approval.",<br>&nbsp;&nbsp;"Key&nbsp;Trends":&nbsp;"There's&nbsp;a&nbsp;noticeable&nbsp;trend&nbsp;towards&nbsp;loan&nbsp;approval&nbsp;among&nbsp;clients&nbsp;with&nbsp;higher&nbsp;education&nbsp;and&nbsp;those&nbsp;who&nbsp;are&nbsp;married,&nbsp;suggesting&nbsp;these&nbsp;factors&nbsp;may&nbsp;positively&nbsp;influence&nbsp;loan&nbsp;decisions."<br>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

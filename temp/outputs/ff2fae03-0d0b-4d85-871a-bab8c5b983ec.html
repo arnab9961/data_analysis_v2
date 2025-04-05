@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated EDA Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .viz-card { margin-bottom: 20px; }
+        .viz-img { max-width: 100%; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .section { margin-bottom: 30px; padding: 20px; border-radius: 10px; background-color: #f8f9fa; }
+        pre { background-color: #f0f0f0; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        h1, h2 { color: #0d6efd; }
+        .nav-tabs { margin-bottom: 20px; }
+        code { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>Automated EDA Dashboard</h1>
+                <p class="lead">Exploratory Data Analysis for: Agrani_Bank_Dataset_Balanced.csv</p>
+                <p>Dataset Shape: 50000 rows × 15 columns</p>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">Summary</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="visualizations-tab" data-bs-toggle="tab" data-bs-target="#visualizations" type="button" role="tab">Visualizations</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="preprocessing-tab" data-bs-toggle="tab" data-bs-target="#preprocessing" type="button" role="tab">Preprocessing</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="insights-tab" data-bs-toggle="tab" data-bs-target="#insights" type="button" role="tab">Insights</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Summary Tab -->
+            <div class="tab-pane fade show active" id="summary" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="section">
+                            <h2>Data Quality Assessment</h2>
+                            <div class="card">
+                                <div class="card-body">
+                                    {<br>&nbsp;&nbsp;"missing_values":&nbsp;"There&nbsp;are&nbsp;no&nbsp;missing&nbsp;values&nbsp;in&nbsp;the&nbsp;dataset.",<br>&nbsp;&nbsp;"outliers":&nbsp;"There&nbsp;are&nbsp;potential&nbsp;outliers&nbsp;in&nbsp;the&nbsp;dataset,&nbsp;particularly&nbsp;in&nbsp;the&nbsp;'Total_Assets'&nbsp;and&nbsp;'Shareholder_Equity'&nbsp;columns,&nbsp;which&nbsp;have&nbsp;large&nbsp;ranges&nbsp;and&nbsp;standard&nbsp;deviations.",<br>&nbsp;&nbsp;"data_types":&nbsp;"The&nbsp;data&nbsp;types&nbsp;are&nbsp;generally&nbsp;as&nbsp;expected,&nbsp;but&nbsp;the&nbsp;'Date'&nbsp;column&nbsp;is&nbsp;currently&nbsp;an&nbsp;object&nbsp;and&nbsp;would&nbsp;be&nbsp;better&nbsp;as&nbsp;a&nbsp;datetime&nbsp;type."<br>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="section">
+                            <h2>Key Statistics</h2>
+                            <div class="card">
+                                <div class="card-body">
+                                    {<br>&nbsp;&nbsp;"Bank_Deposit_Statement":&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;"mean":&nbsp;250174.047,<br>&nbsp;&nbsp;&nbsp;&nbsp;"std":&nbsp;144193.424,<br>&nbsp;&nbsp;&nbsp;&nbsp;"min":&nbsp;546.65,<br>&nbsp;&nbsp;&nbsp;&nbsp;"max":&nbsp;499993.47<br>&nbsp;&nbsp;},<br>&nbsp;&nbsp;"Interest_Income":&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;"mean":&nbsp;503184.002,<br>&nbsp;&nbsp;&nbsp;&nbsp;"std":&nbsp;288151.669,<br>&nbsp;&nbsp;&nbsp;&nbsp;"min":&nbsp;1053.01,<br>&nbsp;&nbsp;&nbsp;&nbsp;"max":&nbsp;999994.93<br>&nbsp;&nbsp;},<br>&nbsp;&nbsp;"Market_Share":&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;"mean":&nbsp;10.05,<br>&nbsp;&nbsp;&nbsp;&nbsp;"std":&nbsp;5.7318,<br>&nbsp;&nbsp;&nbsp;&nbsp;"min":&nbsp;0.1,<br>&nbsp;&nbsp;&nbsp;&nbsp;"max":&nbsp;20.0<br>&nbsp;&nbsp;},<br>&nbsp;&nbsp;"Stock_Price":&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;"mean":&nbsp;254.7013,<br>&nbsp;&nbsp;&nbsp;&nbsp;"std":&nbsp;141.0608,<br>&nbsp;&nbsp;&nbsp;&nbsp;"min":&nbsp;10.01,<br>&nbsp;&nbsp;&nbsp;&nbsp;"max":&nbsp;500.0<br>&nbsp;&nbsp;}<br>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Correlation Analysis</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"positive_correlations":&nbsp;[<br>&nbsp;&nbsp;&nbsp;&nbsp;"Bank_Deposit_Statement&nbsp;and&nbsp;Interest_Income",<br>&nbsp;&nbsp;&nbsp;&nbsp;"Total_Assets&nbsp;and&nbsp;Shareholder_Equity"<br>&nbsp;&nbsp;],<br>&nbsp;&nbsp;"negative_correlations":&nbsp;[<br>&nbsp;&nbsp;&nbsp;&nbsp;"Market_Share&nbsp;and&nbsp;Stock_Price"<br>&nbsp;&nbsp;]<br>}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Patterns and Trends</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"interesting_patterns":&nbsp;"There&nbsp;is&nbsp;a&nbsp;positive&nbsp;relationship&nbsp;between&nbsp;'Bank_Deposit_Statement'&nbsp;and&nbsp;'Interest_Income'.&nbsp;There&nbsp;is&nbsp;also&nbsp;a&nbsp;positive&nbsp;relationship&nbsp;between&nbsp;'Total_Assets'&nbsp;and&nbsp;'Shareholder_Equity'.&nbsp;The&nbsp;'Market_Share'&nbsp;and&nbsp;'Stock_Price'&nbsp;are&nbsp;negatively&nbsp;correlated.",<br>&nbsp;&nbsp;"trends":&nbsp;"The&nbsp;distribution&nbsp;of&nbsp;'Bank_Deposit_Statement'&nbsp;is&nbsp;skewed&nbsp;to&nbsp;the&nbsp;right,&nbsp;indicating&nbsp;that&nbsp;most&nbsp;customers&nbsp;have&nbsp;lower&nbsp;bank&nbsp;deposit&nbsp;statements.",<br>&nbsp;&nbsp;"anomalies":&nbsp;"There&nbsp;are&nbsp;some&nbsp;outliers&nbsp;in&nbsp;the&nbsp;'Total_Assets'&nbsp;and&nbsp;'Shareholder_Equity'&nbsp;columns&nbsp;that&nbsp;may&nbsp;indicate&nbsp;errors&nbsp;in&nbsp;data&nbsp;entry&nbsp;or&nbsp;unusual&nbsp;customer&nbsp;profiles."<br>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Visualizations Tab -->
+            <div class="tab-pane fade" id="visualizations" role="tabpanel">
+                <div class="section">
+                    <h2>Key Visualizations</h2>
+                    <div class="row">
+
+                <div class="col-md-6">
+                    <div class="card viz-card">
+                        <div class="card-header">
+                            <h5>Distribution of Bank Deposit Statement</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="/temp/outputs/30a1646f-285e-4b10-a9a0-b570440d88ac.png" alt="Distribution of Bank Deposit Statement" class="viz-img">
+                            <p class="mt-3">A histogram showing the distribution of bank deposit statements.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card viz-card">
+                        <div class="card-header">
+                            <h5>Relationship between Bank Deposit Statement and Interest Income</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="/temp/outputs/8da8d33d-4a5a-4f31-8507-464b438f1f62.png" alt="Relationship between Bank Deposit Statement and Interest Income" class="viz-img">
+                            <p class="mt-3">A scatter plot showing the relationship between bank deposit statements and interest income.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card viz-card">
+                        <div class="card-header">
+                            <h5>Distribution of Market Share</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="/temp/outputs/d1b813e9-58a2-4f64-82ad-81abbbab82b4.png" alt="Distribution of Market Share" class="viz-img">
+                            <p class="mt-3">A histogram showing the distribution of market share.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card viz-card">
+                        <div class="card-header">
+                            <h5>Relationship between Total Assets and Shareholder Equity</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="/temp/outputs/2ff9d1cc-fcd7-4ec2-b216-709eb9944957.png" alt="Relationship between Total Assets and Shareholder Equity" class="viz-img">
+                            <p class="mt-3">A scatter plot showing the relationship between total assets and shareholder equity.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card viz-card">
+                        <div class="card-header">
+                            <h5>Distribution of Stock Price</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="/temp/outputs/9a728d65-eea0-4353-882c-19518cbe22d0.png" alt="Distribution of Stock Price" class="viz-img">
+                            <p class="mt-3">A histogram showing the distribution of stock price.</p>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+            </div>
+            
+            <!-- Preprocessing Tab -->
+            <div class="tab-pane fade" id="preprocessing" role="tabpanel">
+                <div class="section">
+                    <h2>Recommended Preprocessing Steps</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"handling_missing_values":&nbsp;"No&nbsp;missing&nbsp;value&nbsp;handling&nbsp;is&nbsp;needed,&nbsp;as&nbsp;there&nbsp;are&nbsp;no&nbsp;missing&nbsp;values.",<br>&nbsp;&nbsp;"encoding":&nbsp;"The&nbsp;'Loan_Eligibility'&nbsp;and&nbsp;'Additional_Info'&nbsp;columns&nbsp;are&nbsp;categorical&nbsp;and&nbsp;would&nbsp;need&nbsp;to&nbsp;be&nbsp;encoded&nbsp;before&nbsp;being&nbsp;used&nbsp;in&nbsp;models.",<br>&nbsp;&nbsp;"normalization_needs":&nbsp;"The&nbsp;'Total_Assets',&nbsp;'Shareholder_Equity',&nbsp;and&nbsp;'Operating_Income'&nbsp;columns&nbsp;have&nbsp;very&nbsp;large&nbsp;ranges&nbsp;and&nbsp;may&nbsp;need&nbsp;to&nbsp;be&nbsp;normalized&nbsp;before&nbsp;use&nbsp;in&nbsp;models."<br>}
+                        </div>
+                    </div>
+
+                <div class="alert alert-warning mt-3">
+                    <strong>Warning:</strong> There was an error during preprocessing: 'dict' object has no attribute 'split'
+                </div>
+
+            </div>
+            
+            <!-- Insights Tab -->
+            <div class="tab-pane fade" id="insights" role="tabpanel">
+                <div class="section">
+                    <h2>Key Insights</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            {<br>&nbsp;&nbsp;"key_insights":&nbsp;[<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;bank&nbsp;deposit&nbsp;statements&nbsp;are&nbsp;generally&nbsp;low,&nbsp;with&nbsp;a&nbsp;mean&nbsp;of&nbsp;250174.047.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;interest&nbsp;income&nbsp;is&nbsp;generally&nbsp;high,&nbsp;with&nbsp;a&nbsp;mean&nbsp;of&nbsp;503184.002.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;market&nbsp;share&nbsp;is&nbsp;generally&nbsp;around&nbsp;10%,&nbsp;with&nbsp;a&nbsp;mean&nbsp;of&nbsp;10.05.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"The&nbsp;stock&nbsp;price&nbsp;is&nbsp;generally&nbsp;around&nbsp;254.70,&nbsp;with&nbsp;a&nbsp;mean&nbsp;of&nbsp;254.7013.",<br>&nbsp;&nbsp;&nbsp;&nbsp;"There&nbsp;is&nbsp;a&nbsp;positive&nbsp;relationship&nbsp;between&nbsp;bank&nbsp;deposit&nbsp;statements&nbsp;and&nbsp;interest&nbsp;income."<br>&nbsp;&nbsp;]<br>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

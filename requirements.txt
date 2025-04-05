@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+python-dotenv
+python-multipart
+httpx
+pandas
+matplotlib
+plotly
+kaleido
+fpdf
+pydantic
+seaborn
