@@ -42,11 +42,22 @@ OUTPUT_DIR = Path("temp/outputs")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+# Around line 350-400 in your visualization generation code
+
+vis_id = str(uuid.uuid4())
+output_path = OUTPUT_DIR / f"{vis_id}.png"
+
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Change how we mount the output directory - use a more direct path
+# Near the beginning of your FastAPI app setup
+app.mount("/outputs", StaticFiles(directory=str(OUTPUT_DIR)), name="outputs")
+
 # Global data store - in production use a proper database
 data_store = {}
+
+
 
 @app.get("/", response_class=HTMLResponse)
 async def get_html():
@@ -172,16 +183,16 @@ Format your response as JSON with these keys:
                     # If matplotlib was used
                     if "plt" in ai_analysis["visualization_code"]:
                         vis_id = str(uuid.uuid4())
-                        visualization_path = f"/temp/outputs/{vis_id}.png"
-                        plt.savefig(f"{OUTPUT_DIR}/{vis_id}.png")
+                        visualization_path = f"/outputs/{vis_id}.png"
+                        plt.savefig(f"{OUTPUT_DIR}/{vis_id}.png", dpi=300, bbox_inches='tight', format='png')
                         plt.close()
                     
                     # If plotly was used
                     elif "px" in ai_analysis["visualization_code"]:
                         if "fig" in viz_namespace:
                             vis_id = str(uuid.uuid4())
-                            visualization_path = f"/temp/outputs/{vis_id}.png"
-                            viz_namespace["fig"].write_image(f"{OUTPUT_DIR}/{vis_id}.png")
+                            visualization_path = f"/outputs/{vis_id}.png"
+                            viz_namespace["fig"].write_image(f"{OUTPUT_DIR}/{vis_id}.png", format='png')
                 except Exception as e:
                     ai_analysis["visualization_error"] = str(e)
             
@@ -254,10 +265,11 @@ async def create_visualization(
         else:
             raise HTTPException(status_code=400, detail=f"Unsupported visualization type: {viz_type}")
         
-        # Save the visualization
-        fig.write_image(str(output_path))
+        # Save the visualization explicitly as PNG
+        fig.write_image(str(output_path), format='png')
         
-        return {"visualization": f"/temp/outputs/{vis_id}.png"}
+        # Return the URL path starting with "/outputs/" rather than "outputs/"
+        return {"visualization": f"/outputs/{vis_id}.png"}
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating visualization: {str(e)}")
@@ -320,7 +332,7 @@ async def generate_report(
         report_path = OUTPUT_DIR / f"{report_id}.pdf"
         pdf.output(str(report_path))
         
-        return {"report": f"/temp/outputs/{report_id}.pdf"}
+        return {"report": f"/outputs/{report_id}.pdf"}
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating report: {str(e)}")
@@ -406,9 +418,6 @@ Return your response as JSON with these keys:
             if "visualizations" in ai_analysis and isinstance(ai_analysis["visualizations"], list):
                 for i, viz_item in enumerate(ai_analysis["visualizations"]):
                     try:
-                        # Debug visualization item
-                        print(f"Processing visualization {i+1}:", viz_item)
-                        
                         viz_code = None
                         if "code" in viz_item and viz_item["code"]:
                             viz_code = viz_item["code"]
@@ -418,43 +427,18 @@ Return your response as JSON with these keys:
                             "pd": pd, 
                             "plt": plt,
                             "px": px,
-                            "df": df,
+                            "df": df,  # Use df from the current scope
                             "BytesIO": BytesIO,
                             "np": __import__('numpy'),
-                            "sns": __import__('seaborn')
+                            "sns": __import__('seaborn'),
+                            # Add common dataset names to handle AI-generated code that uses different variable names
+                            "wine_data": df,
+                            "data": df,
+                            "dataset": df
                         }
                         
-                        # If code is missing or empty, generate a default visualization
-                        if not viz_code or len(viz_code.strip()) < 10:
-                            if i == 0:  # First viz - distribution of a numeric column
-                                numeric_cols = df.select_dtypes(include=['number']).columns
-                                if len(numeric_cols) > 0:
-                                    viz_code = f"""
-import seaborn as sns
-plt.figure(figsize=(10, 6))
-sns.histplot(df['{numeric_cols[0]}'], kde=True)
-plt.title('Distribution of {numeric_cols[0]}')
-plt.xlabel('{numeric_cols[0]}')
-plt.ylabel('Count')
-plt.tight_layout()
-"""
-                                    viz_item["title"] = f"Distribution of {numeric_cols[0]}"
-                                    viz_item["description"] = f"Histogram showing the distribution of {numeric_cols[0]} values"
-                            
-                            elif i == 1:  # Second viz - correlation heatmap
-                                numeric_df = df.select_dtypes(include=['number'])
-                                if numeric_df.shape[1] > 1:
-                                    viz_code = """
-import seaborn as sns
-plt.figure(figsize=(12, 10))
-corr = df.select_dtypes(include=['number']).corr()
-mask = np.triu(np.ones_like(corr, dtype=bool))
-sns.heatmap(corr, mask=mask, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5)
-plt.title('Correlation Heatmap')
-plt.tight_layout()
-"""
-                                    viz_item["title"] = "Correlation Heatmap"
-                                    viz_item["description"] = "Heatmap showing correlations between numeric variables"
+                        # Set matplotlib backend explicitly to avoid alternative view
+                        plt.switch_backend('agg')
                         
                         if viz_code:
                             # Try to execute the visualization code
@@ -466,75 +450,27 @@ plt.tight_layout()
                             
                             # If matplotlib was used (this will catch most visualizations)
                             if "plt" in viz_namespace and "plt" in viz_code:
-                                plt.savefig(str(output_path), dpi=300, bbox_inches='tight')
+                                plt.savefig(str(output_path), dpi=300, bbox_inches='tight', format='png')
                                 plt.close('all')  # Close all figures to avoid memory issues
                                 visualization_paths.append({
-                                    "path": f"/temp/outputs/{vis_id}.png",
+                                    "path": f"/outputs/{vis_id}.png",
                                     "title": viz_item.get("title", f"Visualization {i+1}"),
                                     "description": viz_item.get("description", "")
                                 })
-                                continue
                             
                             # If plotly was used
                             if "px" in viz_code or "go." in viz_code or "fig" in viz_namespace:
                                 if "fig" in viz_namespace:
-                                    viz_namespace["fig"].write_image(str(output_path))
+                                    viz_namespace["fig"].write_image(str(output_path), format='png')
                                     visualization_paths.append({
-                                        "path": f"/temp/outputs/{vis_id}.png",
+                                        "path": f"/outputs/{vis_id}.png",
                                         "title": viz_item.get("title", f"Visualization {i+1}"),
                                         "description": viz_item.get("description", "")
                                     })
-                                
-                            # If neither method worked, generate a fallback visualization
-                            elif not visualization_paths:
-                                # Create a simple fallback visualization
-                                plt.figure(figsize=(10, 6))
-                                if df.select_dtypes(include=['number']).shape[1] > 0:
-                                    numeric_col = df.select_dtypes(include=['number']).columns[0]
-                                    plt.hist(df[numeric_col], bins=20, alpha=0.7)
-                                    plt.title(f"Distribution of {numeric_col}")
-                                    plt.xlabel(numeric_col)
-                                    plt.ylabel("Frequency")
-                                else:
-                                    # For categorical data
-                                    cat_col = df.columns[0]
-                                    counts = df[cat_col].value_counts().head(10)
-                                    counts.plot(kind='bar')
-                                    plt.title(f"Top 10 values in {cat_col}")
-                                    plt.xticks(rotation=45)
-                                
-                                plt.tight_layout()
-                                plt.savefig(str(output_path), dpi=300, bbox_inches='tight')
-                                plt.close()
-                                visualization_paths.append({
-                                    "path": f"/temp/outputs/{vis_id}.png",
-                                    "title": f"Fallback Visualization for {viz_item.get('title', f'Visualization {i+1}')}",
-                                    "description": "Automatically generated fallback visualization"
-                                })
-                    
                     except Exception as e:
                         print(f"Visualization error for item {i+1}: {str(e)}")
-                        try:
-                            # Try to generate a fallback viz on error
-                            vis_id = str(uuid.uuid4())
-                            output_path = OUTPUT_DIR / f"{vis_id}.png"
-                            
-                            plt.figure(figsize=(10, 6))
-                            plt.text(0.5, 0.5, f"Error generating visualization:\n{str(e)}", 
-                                     ha='center', va='center', fontsize=12, wrap=True)
-                            plt.axis('off')
-                            plt.savefig(str(output_path), dpi=300)
-                            plt.close()
-                            
-                            visualization_paths.append({
-                                "path": f"/temp/outputs/{vis_id}.png",
-                                "title": f"Error in Visualization {i+1}",
-                                "description": f"Error: {str(e)}"
-                            })
-                        except Exception:
-                            pass
-
-            # If we still don't have any visualizations, add default ones
+            
+            # If no visualizations have been generated, try default ones
             if not visualization_paths:
                 try:
                     # 1. Add a data overview visualization
@@ -580,11 +516,11 @@ plt.tight_layout()
                     plt.axis('off')
                     
                     plt.tight_layout()
-                    plt.savefig(str(output_path), dpi=300)
+                    plt.savefig(str(output_path), dpi=300, format='png')
                     plt.close()
                     
                     visualization_paths.append({
-                        "path": f"/temp/outputs/{vis_id}.png",
+                        "path": f"/outputs/{vis_id}.png",
                         "title": "Data Overview",
                         "description": "A summary of key characteristics in the dataset"
                     })
@@ -600,33 +536,38 @@ plt.tight_layout()
                         sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f')
                         plt.title('Correlation Heatmap')
                         plt.tight_layout()
-                        plt.savefig(str(output_path), dpi=300)
+                        plt.savefig(str(output_path), dpi=300, format='png')
                         plt.close()
                         
                         visualization_paths.append({
-                            "path": f"/temp/outputs/{vis_id}.png",
+                            "path": f"/outputs/{vis_id}.png",
                             "title": "Correlation Heatmap",
                             "description": "Heatmap showing correlations between numeric variables"
                         })
-                
                 except Exception as e:
                     print(f"Error creating default visualizations: {str(e)}")
-            
-            def format_content(content):
-                """Format content for HTML, handling different types"""
-                if isinstance(content, str):
-                    return content.replace("\n", "<br>")
-                elif isinstance(content, dict) or isinstance(content, list):
-                    return json.dumps(content, indent=2).replace("\n", "<br>").replace(" ", "&nbsp;")
-                else:
-                    return str(content).replace("\n", "<br>")
-
-            # Create a dashboard HTML
-            dashboard_id = str(uuid.uuid4())
-            dashboard_path = OUTPUT_DIR / f"{dashboard_id}.html"
-
-            with open(dashboard_path, "w") as f:
-                f.write("""
+        
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(status_code=e.response.status_code, 
+                                detail=f"Error from OpenRouter API: {e.response.text}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error analyzing data: {str(e)}")
+    
+    def format_content(content):
+        """Format content for HTML, handling different types"""
+        if isinstance(content, str):
+            return content.replace("\n", "<br>")
+        elif isinstance(content, dict) or isinstance(content, list):
+            return json.dumps(content, indent=2).replace("\n", "<br>").replace(" ", "&nbsp;")
+        else:
+            return str(content).replace("\n", "<br>")
+    
+    # Create a dashboard HTML
+    dashboard_id = str(uuid.uuid4())
+    dashboard_path = OUTPUT_DIR / f"{dashboard_id}.html"
+    
+    with open(dashboard_path, "w") as f:
+        f.write("""
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -636,8 +577,19 @@ plt.tight_layout()
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { padding: 20px; }
-        .viz-card { margin-bottom: 20px; }
-        .viz-img { max-width: 100%; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .viz-card { margin-bottom: 20px; height: 100%; }
+        .viz-img { 
+            max-width: 100%; 
+            max-height: 400px; 
+            border-radius: 5px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            object-fit: contain;
+        }
+        .card-body.text-center { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
         .section { margin-bottom: 30px; padding: 20px; border-radius: 10px; background-color: #f8f9fa; }
         pre { background-color: #f0f0f0; padding: 15px; border-radius: 5px; overflow-x: auto; }
         h1, h2 { color: #0d6efd; }
@@ -695,7 +647,6 @@ plt.tight_layout()
                         </div>
                     </div>
                 </div>
-                
                 <div class="section">
                     <h2>Correlation Analysis</h2>
                     <div class="card">
@@ -704,7 +655,6 @@ plt.tight_layout()
                         </div>
                     </div>
                 </div>
-                
                 <div class="section">
                     <h2>Patterns and Trends</h2>
                     <div class="card">
@@ -714,44 +664,43 @@ plt.tight_layout()
                     </div>
                 </div>
             </div>
-            
+
             <!-- Visualizations Tab -->
             <div class="tab-pane fade" id="visualizations" role="tabpanel">
                 <div class="section">
                     <h2>Key Visualizations</h2>
                     <div class="row">
 """)
-
-                # Add each visualization
-                if visualization_paths:
-                    for viz in visualization_paths:
-                        f.write(f"""
-                <div class="col-md-6">
-                    <div class="card viz-card">
-                        <div class="card-header">
-                            <h5>{viz["title"]}</h5>
+            # Add each visualization
+        if visualization_paths:
+                for viz in visualization_paths:
+                    f.write(f"""
+                        <div class="col-md-6">
+                            <div class="card viz-card">
+                                <div class="card-header">
+                                    <h5>{viz["title"]}</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <img src="{viz["path"]}" alt="{viz["title"]}" class="viz-img">
+                                    <p class="mt-3">{viz.get("description", "")}</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body text-center">
-                            <img src="{viz["path"]}" alt="{viz["title"]}" class="viz-img">
-                            <p class="mt-3">{viz.get("description", "")}</p>
-                        </div>
-                    </div>
-                </div>
 """)
-                else:
-                    f.write("""
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        No visualizations were generated. This could be because the data doesn't lend itself to visualization,
-                        or there was an error in generating the visualizations.
-                    </div>
-                </div>
-""")
-
+        else:
                 f.write("""
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            No visualizations were generated. This could be because the data doesn't lend itself to visualization,
+                            or there was an error in generating the visualizations.
+                        </div>
+                    </div>
+""")
+        f.write("""
+                    </div>
                 </div>
             </div>
-            
+
             <!-- Preprocessing Tab -->
             <div class="tab-pane fade" id="preprocessing" role="tabpanel">
                 <div class="section">
@@ -761,11 +710,11 @@ plt.tight_layout()
                             """ + format_content(ai_analysis.get("preprocessing", "No preprocessing recommendations available")) + """
                         </div>
                     </div>
+                </div>
 """)
-
-                # Add preprocessed data info if available
-                if "preprocessed_data_info" in ai_analysis:
-                    f.write(f"""
+            # Add preprocessed data info if available
+        if "preprocessed_data_info" in ai_analysis:
+                f.write(f"""
                 <div class="mt-4">
                     <h3>Preprocessing Results</h3>
                     <p>Original Shape: {ai_analysis["preprocessed_data_info"]["original_shape"]}</p>
@@ -773,28 +722,25 @@ plt.tight_layout()
                     <h4>Changes:</h4>
                     <ul>
 """)
-                    # Handle case where changes might be empty
-                    if ai_analysis["preprocessed_data_info"]["changes"]:
-                        for change in ai_analysis["preprocessed_data_info"]["changes"]:
-                            f.write(f"<li>{change}</li>")
-                    else:
-                        f.write("<li>No significant data type changes detected</li>")
-                    f.write("""
+                # Handle case where changes might be empty
+                if ai_analysis["preprocessed_data_info"]["changes"]:
+                    for change in ai_analysis["preprocessed_data_info"]["changes"]:
+                        f.write(f"<li>{change}</li>")
+                else:
+                    f.write("<li>No significant data type changes detected</li>")
+                f.write("""
                     </ul>
                 </div>
 """)
-
-                # Include preprocessing errors if any
                 if "preprocessing_error" in ai_analysis:
                     f.write(f"""
                 <div class="alert alert-warning mt-3">
                     <strong>Warning:</strong> There was an error during preprocessing: {ai_analysis["preprocessing_error"]}
                 </div>
 """)
-
-                f.write("""
+        f.write("""
             </div>
-            
+
             <!-- Insights Tab -->
             <div class="tab-pane fade" id="insights" role="tabpanel">
                 <div class="section">
@@ -808,39 +754,32 @@ plt.tight_layout()
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 """)
-            
-            # Store dashboard path in data_store
-            data_store[file_id]["dashboard"] = f"/temp/outputs/{dashboard_id}.html"
-            
-            return {
-                "dashboard_url": f"/temp/outputs/{dashboard_id}.html",
-                "analysis": {
-                    "data_quality": ai_analysis.get("data_quality", ""),
-                    "statistics": ai_analysis.get("statistics", ""),
-                    "correlations": ai_analysis.get("correlations", ""),
-                    "patterns": ai_analysis.get("patterns", ""),
-                    "insights": ai_analysis.get("insights", "")
-                },
-                "visualizations": visualization_paths
-            }
         
-        except httpx.HTTPStatusError as e:
-            raise HTTPException(status_code=e.response.status_code, 
-                               detail=f"Error from OpenRouter API: {e.response.text}")
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error analyzing data: {str(e)}")
-
-@app.get("/temp/outputs/{filename}")
-async def get_output_file(filename: str):
-    """Serve output files (visualizations and reports)"""
+        # Store dashboard path in data_store
+        data_store[file_id]["dashboard"] = f"/outputs/{dashboard_id}.html"
+        
+        return {
+            "dashboard_url": f"/outputs/{dashboard_id}.html",
+            "analysis": {
+                "data_quality": ai_analysis.get("data_quality", ""),
+                "statistics": ai_analysis.get("statistics", ""),
+                "correlations": ai_analysis.get("correlations", ""),
+                "patterns": ai_analysis.get("patterns", ""),
+                "insights": ai_analysis.get("insights", "")
+            },
+            "visualizations": visualization_paths
+        }
+        
+@app.get("/outputs/{filename}")
+async def get_visualization(filename: str):
+    """Serve visualization files directly"""
     file_path = OUTPUT_DIR / filename
     if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
+        raise HTTPException(status_code=404, detail="Visualization file not found")
     
     return FileResponse(str(file_path))
 
